@@ -1,0 +1,11 @@
+v,6
+acc,20
+dec,20
+v_s,13
+acc_s,40
+dec_s,40
+gravity,-18.62
+jump_v,8.7
+jump_d_v,10.7
+jump_t_v,12.3
+jump_l_v,6.15
