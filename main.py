@@ -120,7 +120,6 @@ def main() -> None:
     height_over_distance.append(with_input_wall_jump_height_over_distance)
     plot_and_safe(height_over_distance, 'distance (m)', 'height (m)', "Jump Height over Distance")
 
-    # TODO: Climbing movement -> normal, sprinting -> movement over time and distance, Climb Jump!
     # Climb movement over time
     # climb_movement_over_time = []
     # default_climb_movement_over_time = calc_movement_over_time(v_c, acc_c, dec_c, "Default")
