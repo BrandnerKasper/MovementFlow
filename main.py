@@ -9,7 +9,7 @@ from typing import Optional
 
 def main() -> None:
     # Read data from csv
-    filename = "BK.csv"
+    filename = "DK64.csv"
     m_data = read_csv(filename)
 
     # Normal movement
