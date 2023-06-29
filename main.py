@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 from Data import Data
+from Data import Data3D
 from typing import Optional
 
 
 def main() -> None:
     # Read data from csv
-    filename = "DK64.csv"
+    filename = "SM64.csv"
     m_data = read_csv(filename)
 
     # Normal movement
@@ -37,121 +38,130 @@ def main() -> None:
     climb_dec = m_data["climb_dec"]
     climb_sprint_v = m_data["climb_sprint_v"]
 
+    # Plotting 3D
+    # Velocity over time and distance
+    velocity_over_time_and_distance = []
+    walk_velocity_over_time_and_distance = calc_velocity_over_time_and_distance(v, acc, "Walking")
+    velocity_over_time_and_distance.append(walk_velocity_over_time_and_distance)
+    sprint_velocity_over_time_and_distance = calc_velocity_over_time_and_distance(sprint_v, sprint_acc, "Sprinting")
+    velocity_over_time_and_distance.append(sprint_velocity_over_time_and_distance)
+    fast_climb_velocity_over_time_and_distance = calc_velocity_over_time_and_distance(climb_sprint_v, climb_acc, "Fast Climbing")
+    velocity_over_time_and_distance.append(fast_climb_velocity_over_time_and_distance)
+    climb_velocity_over_time_and_distance = calc_velocity_over_time_and_distance(climb_v, climb_acc, "Climbing")
+    velocity_over_time_and_distance.append(climb_velocity_over_time_and_distance)
+    plot_and_safe_3d(velocity_over_time_and_distance, 'time (s)', 'distance (m)', 'velocity (m/s)', "Velocity over time and distance")
+
+    # Movement over time and distance
+    movement_over_time_and_distance = []
+    walk_movement_over_time_and_distance = calc_movement_over_time_and_distance(v, acc, dec, "Walking")
+    movement_over_time_and_distance.append(walk_movement_over_time_and_distance)
+    sprint_movement_over_time_and_distance = calc_movement_over_time_and_distance(sprint_v, sprint_acc, sprint_dec, "Sprinting")
+    movement_over_time_and_distance.append(sprint_movement_over_time_and_distance)
+    fast_climb_movement_over_time_and_distance = calc_movement_over_time_and_distance(climb_sprint_v, climb_acc, climb_dec, "Fast Climbing")
+    movement_over_time_and_distance.append(fast_climb_movement_over_time_and_distance)
+    climb_movement_over_time_and_distance = calc_movement_over_time_and_distance(climb_v, climb_acc, climb_dec, "Climbing")
+    movement_over_time_and_distance.append(climb_movement_over_time_and_distance)
+    plot_and_safe_3d(movement_over_time_and_distance, 'time (s)', 'distance (m)', 'velocity (m/s)', "Movement over time and distance")
+
+    # Height over time and distance
+    height_over_time_and_distance = []
+    jump_height_over_time_and_distance = calc_height_over_time_and_distance(jump, gravity, v, "Default Jump")
+    height_over_time_and_distance.append(jump_height_over_time_and_distance)
+    double_jump_height_over_time_and_distance = calc_height_over_time_and_distance(double_jump, gravity, v, "Double Jump")
+    height_over_time_and_distance.append(double_jump_height_over_time_and_distance)
+    triple_jump_height_over_time_and_distance = calc_height_over_time_and_distance(triple_jump, gravity, v, "Triple Jump")
+    height_over_time_and_distance.append(triple_jump_height_over_time_and_distance)
+    long_jump_calc_height_over_time_and_distance= calc_height_over_time_and_distance(long_jump, gravity, sprint_v, "Long Jump")
+    height_over_time_and_distance.append(long_jump_calc_height_over_time_and_distance)
+    wall_jump_height_over_time_and_distance_no_input = calc_height_over_time_and_distance(wall_jump, gravity, wall_jump_h, "Wall Jump no input")
+    height_over_time_and_distance.append(wall_jump_height_over_time_and_distance_no_input)
+    # 0.41 * v is a rough estimation based on the delay in the game to fight wall hugging
+    wall_jump_height_over_time_and_distance_with_input = calc_height_over_time_and_distance(wall_jump, gravity, wall_jump_h + 0.41 * v, "Wall Jump with input")
+    height_over_time_and_distance.append(wall_jump_height_over_time_and_distance_with_input)
+    plot_and_safe_3d(height_over_time_and_distance, 'time (s)', 'distance (m)', 'height (m)', "Jump Height over Time and Distance")
+
     # Plotting
 
-    # Velocity over time
-    velocity_over_time = []
-    walk_velocity_over_time = calc_velocity_over_time(v, acc, "Walking")
-    velocity_over_time.append(walk_velocity_over_time)
-    sprint_velocity_over_time = calc_velocity_over_time(sprint_v, sprint_acc, "Sprinting")
-    velocity_over_time.append(sprint_velocity_over_time)
-    climb_velocity_over_time = calc_velocity_over_time(climb_v, climb_acc, "Climbing")
-    velocity_over_time.append(climb_velocity_over_time)
-    fast_climb_velocity_over_time = calc_velocity_over_time(climb_sprint_v, climb_acc, "Fast Climbing")
-    velocity_over_time.append(fast_climb_velocity_over_time)
-    plot_and_safe(velocity_over_time, 'time (s)', 'velocity (m/s)', "Velocity over Time")
-
-    # Movement over time
-    movement_over_time = []
-    walk_movement_over_time = calc_movement_over_time(v, acc, dec, "Walking")
-    movement_over_time.append(walk_movement_over_time)
-    sprint_movement_over_time = calc_movement_over_time(sprint_v, sprint_acc, sprint_dec, "Sprinting")
-    movement_over_time.append(sprint_movement_over_time)
-    sprint_climb_movement_over_time = calc_movement_over_time(climb_sprint_v, climb_acc, climb_dec, "Fast Climbing")
-    movement_over_time.append(sprint_climb_movement_over_time)
-    default_climb_movement_over_time = calc_movement_over_time(climb_v, climb_acc, climb_dec, "Climbing")
-    movement_over_time.append(default_climb_movement_over_time)
-    plot_and_safe(movement_over_time, 'time (s)', 'velocity (m/s)', "Movement over Time")
-
-    # Velocity over distance
-    velocity_over_distance = []
-    walk_velocity_over_distance = calc_velocity_over_distance(v, acc, "Walking")
-    velocity_over_distance.append(walk_velocity_over_distance)
-    sprint_velocity_over_distance = calc_velocity_over_distance(sprint_v, sprint_acc, "Sprinting")
-    velocity_over_distance.append(sprint_velocity_over_distance)
-    fast_climb_velocity_over_distance = calc_velocity_over_distance(climb_sprint_v, climb_acc, "Fast Climbing")
-    velocity_over_distance.append(fast_climb_velocity_over_distance)
-    climb_velocity_over_distance = calc_velocity_over_distance(climb_v, climb_acc, "Climbing")
-    velocity_over_distance.append(climb_velocity_over_distance)
-    plot_and_safe(velocity_over_distance, 'distance (m)', 'velocity (m/s)', "Velocity over Distance")
-
-    # Movement over distance
-    movement_over_distance = []
-    walk_movement_over_distance = calc_movement_over_distance(v, acc, dec, "Walking")
-    movement_over_distance.append(walk_movement_over_distance)
-    sprint_movement_over_distance = calc_movement_over_distance(sprint_v, sprint_acc, sprint_dec, "Sprinting")
-    movement_over_distance.append(sprint_movement_over_distance)
-    sprint_climb_movement_over_distance = calc_movement_over_distance(climb_sprint_v, climb_acc, climb_dec, "Fast Climbing")
-    movement_over_distance.append(sprint_climb_movement_over_distance)
-    default_climb_movement_over_distance = calc_movement_over_distance(climb_v, climb_acc, climb_dec, "Climbing")
-    movement_over_distance.append(default_climb_movement_over_distance)
-    plot_and_safe(movement_over_distance, 'distance (m)', 'velocity (m/s)', "Movement over Distance")
-
-    # Height over Time
-    height_over_time = []
-    default_jump_height_over_time = calc_height_over_time(jump, gravity, "Default Jump")
-    height_over_time.append(default_jump_height_over_time)
-    double_jump_height_over_time = calc_height_over_time(double_jump, gravity, "Double Jump")
-    height_over_time.append(double_jump_height_over_time)
-    triple_jump_height_over_time = calc_height_over_time(triple_jump, gravity, "Triple Jump")
-    height_over_time.append(triple_jump_height_over_time)
-    long_jump_height_over_time = calc_height_over_time(long_jump, gravity, "Long Jump")
-    height_over_time.append(long_jump_height_over_time)
-    wall_jump_height_over_time = calc_height_over_time(wall_jump, gravity, "Wall Jump")
-    height_over_time.append(wall_jump_height_over_time)
-    plot_and_safe(height_over_time, 'time (s)', 'height (m)', "Jump Height over Time")
-
-    # Height over Distance
-    height_over_distance = []
-    default_jump_height_over_distance = calc_height_over_distance(jump, gravity, v, "Default Jump")
-    height_over_distance.append(default_jump_height_over_distance)
-    double_jump_height_over_distance = calc_height_over_distance(double_jump, gravity, v, "Double Jump")
-    height_over_distance.append(double_jump_height_over_distance)
-    triple_jump_height_over_distance = calc_height_over_distance(triple_jump, gravity, v, "Triple Jump")
-    height_over_distance.append(triple_jump_height_over_distance)
-    long_jump_height_over_distance = calc_height_over_distance(long_jump, gravity, sprint_v, "Long Jump")
-    height_over_distance.append(long_jump_height_over_distance)
-    no_input_wall_jump_height_over_distance = calc_height_over_distance(wall_jump, gravity, wall_jump_h, "Wall Jump No Input")
-    height_over_distance.append(no_input_wall_jump_height_over_distance)
-    with_input_wall_jump_height_over_distance = \
-        calc_height_over_distance(wall_jump, gravity, wall_jump_h + 0.41 * v, "Wall Jump With Input")
-    # the 0.41 is rough estimation, for game balancing purpose and fighting wall hugging there is a small delay
-    # after the wall jump before the player is allowed to air drift into a direction
-    height_over_distance.append(with_input_wall_jump_height_over_distance)
-    plot_and_safe(height_over_distance, 'distance (m)', 'height (m)', "Jump Height over Distance")
-
-    # Climb movement over time
-    # climb_movement_over_time = []
-    # default_climb_movement_over_time = calc_movement_over_time(v_c, acc_c, dec_c, "Default")
-    # climb_movement_over_time.append(default_climb_movement_over_time)
-    # sprint_climb_movement_over_time = calc_movement_over_time(v_c_s, acc_c, dec_c, "Sprinting")
-    # climb_movement_over_time.append(sprint_climb_movement_over_time)
-    # plot_and_safe(climb_movement_over_time, 'time (s)', 'velocity (m/s)', "Climb Movement over Time")
-
-    # CLimb movement over distance
-    # climb_movement_over_distance = []
-    # default_climb_movement_over_distance = calc_movement_over_distance(v_c, acc_c, dec_c, "Default")
-    # climb_movement_over_distance.append(default_climb_movement_over_distance)
-    # sprint_climb_movement_over_distance = calc_movement_over_distance(v_c_s, acc_c, dec_c, "Sprinting")
-    # climb_movement_over_distance.append(sprint_climb_movement_over_distance)
-    # plot_and_safe(climb_movement_over_distance, 'distance (m)', 'velocity (m/s)', "Climb Movement over Distance")
-
-    # Climb Jump Height over Time
-    # climb_jump_height_over_time = []
-    # default_climb_jump_height_over_time = calc_height_over_time(jump_c_vv, gravity)
-    # climb_jump_height_over_time.append(default_climb_jump_height_over_time)
-    # plot_and_safe(climb_jump_height_over_time, 'time (s)', 'height (m)', "Climb Jump Height over Time")
-
-    # Climb Jump Height over Distance
-    # climb_jump_height_over_distance = []
-    # no_input_climb_jump_height_over_distance = calc_height_over_distance(jump_c_vv, gravity, jump_c_hv, "No Input")
-    # climb_jump_height_over_distance.append(no_input_climb_jump_height_over_distance)
-    # with_input_climb_jump_height_over_distance = \
-    #     calc_height_over_distance(jump_c_vv, gravity, jump_c_hv + 0.41*v, "With Input")
+    # # Velocity over time
+    # velocity_over_time = []
+    # walk_velocity_over_time = calc_velocity_over_time(v, acc, "Walking")
+    # velocity_over_time.append(walk_velocity_over_time)
+    # sprint_velocity_over_time = calc_velocity_over_time(sprint_v, sprint_acc, "Sprinting")
+    # velocity_over_time.append(sprint_velocity_over_time)
+    # climb_velocity_over_time = calc_velocity_over_time(climb_v, climb_acc, "Climbing")
+    # velocity_over_time.append(climb_velocity_over_time)
+    # fast_climb_velocity_over_time = calc_velocity_over_time(climb_sprint_v, climb_acc, "Fast Climbing")
+    # velocity_over_time.append(fast_climb_velocity_over_time)
+    # plot_and_safe(velocity_over_time, 'time (s)', 'velocity (m/s)', "Velocity over Time")
+    #
+    # # Movement over time
+    # movement_over_time = []
+    # walk_movement_over_time = calc_movement_over_time(v, acc, dec, "Walking")
+    # movement_over_time.append(walk_movement_over_time)
+    # sprint_movement_over_time = calc_movement_over_time(sprint_v, sprint_acc, sprint_dec, "Sprinting")
+    # movement_over_time.append(sprint_movement_over_time)
+    # sprint_climb_movement_over_time = calc_movement_over_time(climb_sprint_v, climb_acc, climb_dec, "Fast Climbing")
+    # movement_over_time.append(sprint_climb_movement_over_time)
+    # default_climb_movement_over_time = calc_movement_over_time(climb_v, climb_acc, climb_dec, "Climbing")
+    # movement_over_time.append(default_climb_movement_over_time)
+    # plot_and_safe(movement_over_time, 'time (s)', 'velocity (m/s)', "Movement over Time")
+    #
+    # # Velocity over distance
+    # velocity_over_distance = []
+    # walk_velocity_over_distance = calc_velocity_over_distance(v, acc, "Walking")
+    # velocity_over_distance.append(walk_velocity_over_distance)
+    # sprint_velocity_over_distance = calc_velocity_over_distance(sprint_v, sprint_acc, "Sprinting")
+    # velocity_over_distance.append(sprint_velocity_over_distance)
+    # fast_climb_velocity_over_distance = calc_velocity_over_distance(climb_sprint_v, climb_acc, "Fast Climbing")
+    # velocity_over_distance.append(fast_climb_velocity_over_distance)
+    # climb_velocity_over_distance = calc_velocity_over_distance(climb_v, climb_acc, "Climbing")
+    # velocity_over_distance.append(climb_velocity_over_distance)
+    # plot_and_safe(velocity_over_distance, 'distance (m)', 'velocity (m/s)', "Velocity over Distance")
+    #
+    # # Movement over distance
+    # movement_over_distance = []
+    # walk_movement_over_distance = calc_movement_over_distance(v, acc, dec, "Walking")
+    # movement_over_distance.append(walk_movement_over_distance)
+    # sprint_movement_over_distance = calc_movement_over_distance(sprint_v, sprint_acc, sprint_dec, "Sprinting")
+    # movement_over_distance.append(sprint_movement_over_distance)
+    # sprint_climb_movement_over_distance = calc_movement_over_distance(climb_sprint_v, climb_acc, climb_dec, "Fast Climbing")
+    # movement_over_distance.append(sprint_climb_movement_over_distance)
+    # default_climb_movement_over_distance = calc_movement_over_distance(climb_v, climb_acc, climb_dec, "Climbing")
+    # movement_over_distance.append(default_climb_movement_over_distance)
+    # plot_and_safe(movement_over_distance, 'distance (m)', 'velocity (m/s)', "Movement over Distance")
+    #
+    # # Height over Time
+    # height_over_time = []
+    # default_jump_height_over_time = calc_height_over_time(jump, gravity, "Default Jump")
+    # height_over_time.append(default_jump_height_over_time)
+    # double_jump_height_over_time = calc_height_over_time(double_jump, gravity, "Double Jump")
+    # height_over_time.append(double_jump_height_over_time)
+    # triple_jump_height_over_time = calc_height_over_time(triple_jump, gravity, "Triple Jump")
+    # height_over_time.append(triple_jump_height_over_time)
+    # long_jump_height_over_time = calc_height_over_time(long_jump, gravity, "Long Jump")
+    # height_over_time.append(long_jump_height_over_time)
+    # wall_jump_height_over_time = calc_height_over_time(wall_jump, gravity, "Wall Jump")
+    # height_over_time.append(wall_jump_height_over_time)
+    # plot_and_safe(height_over_time, 'time (s)', 'height (m)', "Jump Height over Time")
+    #
+    # # Height over Distance
+    # height_over_distance = []
+    # default_jump_height_over_distance = calc_height_over_distance(jump, gravity, v, "Default Jump")
+    # height_over_distance.append(default_jump_height_over_distance)
+    # double_jump_height_over_distance = calc_height_over_distance(double_jump, gravity, v, "Double Jump")
+    # height_over_distance.append(double_jump_height_over_distance)
+    # triple_jump_height_over_distance = calc_height_over_distance(triple_jump, gravity, v, "Triple Jump")
+    # height_over_distance.append(triple_jump_height_over_distance)
+    # long_jump_height_over_distance = calc_height_over_distance(long_jump, gravity, sprint_v, "Long Jump")
+    # height_over_distance.append(long_jump_height_over_distance)
+    # no_input_wall_jump_height_over_distance = calc_height_over_distance(wall_jump, gravity, wall_jump_h, "Wall Jump No Input")
+    # height_over_distance.append(no_input_wall_jump_height_over_distance)
+    # with_input_wall_jump_height_over_distance = \
+    #     calc_height_over_distance(wall_jump, gravity, wall_jump_h + 0.41 * v, "Wall Jump With Input")
     # # the 0.41 is rough estimation, for game balancing purpose and fighting wall hugging there is a small delay
     # # after the wall jump before the player is allowed to air drift into a direction
-    # climb_jump_height_over_distance.append(with_input_climb_jump_height_over_distance)
-    # plot_and_safe(climb_jump_height_over_distance, 'distance (m)', 'height (m)', "Climb Jump Height over Distance")
+    # height_over_distance.append(with_input_wall_jump_height_over_distance)
+    # plot_and_safe(height_over_distance, 'distance (m)', 'height (m)', "Jump Height over Distance")
 
 
 def read_csv(filename: str) -> dict[str, float]:
@@ -290,6 +300,90 @@ def plot_and_safe(data: list[Data], xlabel: str, ylabel: str, title: str) -> Non
             ax.plot(x, y)
 
     ax.set(xlabel=xlabel, ylabel=ylabel, title=title)
+    ax.grid()
+
+    title.replace(' ', '_')
+    title.lower()
+    path = "plots/" + title
+    fig.savefig(path + ".png")
+    plt.show()
+
+
+def calc_velocity_over_time_and_distance(v: float, acc: float, label: Optional[str] = None) \
+        -> Data3D:
+    v = np.arange(0, v, 0.01)
+    t = v / acc
+    d = (v * v) / (2 * acc)
+    return Data3D(x=t, y=d, z=v, label=label)
+
+
+def calc_movement_over_time_and_distance(v_max: float, acc: float, dec: float, label: Optional[str] = None, time_offset: float = 0.5) -> Data3D:
+    # over time
+    t_acc = v_max / acc
+    t_dec = v_max / dec
+    t_max = t_acc + time_offset + t_dec
+    t = np.arange(0, t_max, 0.0001)
+
+    conditions = [
+        (t < t_acc),
+        (t_acc <= t) & (t < t_acc + time_offset),
+        (t_acc + time_offset <= t)
+    ]
+    functions = [
+        lambda n: acc * n,
+        lambda n: v_max,
+        lambda n: v_max - dec * (n - t_acc - time_offset)
+    ]
+    v = np.piecewise(t, conditions, functions)
+
+    # over distance
+    d = np.cumsum(v) * 0.0001
+
+    return Data3D(x=t, y=d, z=v, label=label)
+
+
+def calc_height_over_time_and_distance(jump_v: float, gravity: float, ground_v: float, label: Optional[str] = None) -> Data3D:
+    # Calc max jump height
+    h_max = math.pow(jump_v, 2) / (gravity * -2.0)
+
+    # Calc time in air
+    t_max = math.sqrt(-2.0 * h_max / gravity) * 2.0
+
+    t = np.arange(0, t_max, 0.0001)
+    conditions = [
+        (t <= t_max / 2),
+        (t > t_max / 2)
+    ]
+    # h = jump_v * t + 0.5 * gravity * t**2
+    functions = [
+        lambda n: jump_v * n + 0.5 * gravity * n ** 2,
+        lambda n: jump_v * n + 0.5 * gravity * (-n) ** 2
+    ]
+
+    h = np.piecewise(t, conditions, functions)
+
+    d = ground_v * t
+
+    return Data3D(x=t, y=d, z=h, label=label)
+
+
+def plot_and_safe_3d(data: list[Data3D], xlabel: str, ylabel: str, zlabel: str, title: str) -> None:
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    for d in data:
+        x = d.x
+        y = d.y
+        z = d.z
+
+        if d.label is not None:
+            label = d.label
+            ax.scatter(x, y, z, label=label)
+            ax.legend()
+
+        else:
+            ax.scatter(x, y, z)
+
+    ax.set(xlabel=xlabel, ylabel=ylabel, zlabel=zlabel, title=title)
     ax.grid()
 
     title.replace(' ', '_')
