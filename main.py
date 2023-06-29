@@ -1,6 +1,7 @@
 import math
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import csv
 from Data import Data
@@ -9,10 +10,34 @@ from typing import Optional
 
 
 def main() -> None:
+    filename = "All.csv"
+    m_data_list = read_csv_multiple(filename)
+
+    # Velocity over Time and Distance
+    plot_velocity_over_time_and_distance_multi(m_data_list, "v", "acc", "Walk Velocity over Time and Distance")
+    plot_velocity_over_time_and_distance_multi(m_data_list, "sprint_v", "sprint_acc", "Sprint Velocity over Time and Distance")
+    plot_velocity_over_time_and_distance_multi(m_data_list, "climb_v", "climb_acc", "Climbing Velocity over Time and Distance")
+    plot_velocity_over_time_and_distance_multi(m_data_list, "climb_sprint_v", "climb_acc", "Fast Climbing Velocity over Time and Distance")
+
+    # Movement over Time and Distance
+    plot_movement_over_time_and_distance_multi(m_data_list, "v", "acc", "dec", "Walk Movement over Time and Distance")
+    plot_movement_over_time_and_distance_multi(m_data_list, "sprint_v", "sprint_acc", "sprint_dec", "Sprint Movement over Time and Distance")
+    plot_movement_over_time_and_distance_multi(m_data_list, "climb_v", "climb_acc", "climb_dec", "Climbing Movement over Time and Distance")
+    plot_movement_over_time_and_distance_multi(m_data_list, "climb_sprint_v", "climb_acc", "climb_dec", "Fast Climbing Movement over Time and Distance")
+
+    # Height over time and distance
+    plot_height_over_time_and_distance_multi(m_data_list, "jump", "gravity", "v", "Default Jump over Time and Distance")
+    plot_height_over_time_and_distance_multi(m_data_list, "double_jump", "gravity", "v", "Double Jump over Time and Distance")
+    plot_height_over_time_and_distance_multi(m_data_list, "triple_jump", "gravity", "v", "Triple Jump over Time and Distance")
+    plot_height_over_time_and_distance_multi(m_data_list, "long_jump", "gravity", "sprint_v", "Long Jump over Time and Distance")
+    plot_height_over_time_and_distance_multi(m_data_list, "wall_jump", "gravity", "wall_jump_h", "Wall Jump over Time and Distance (No Input)")
+    plot_height_over_time_and_distance_multi(m_data_list, "wall_jump", "gravity", "v", "Wall Jump over Time and Distance (With Input)")
+
+
+def old() -> None:
     # Read data from csv
     filename = "SM64.csv"
     m_data = read_csv(filename)
-
     # Normal movement
     v = m_data["v"]
     acc = m_data["acc"]
@@ -177,6 +202,61 @@ def read_csv(filename: str) -> dict[str, float]:
             except ValueError:
                 data[key] = value
     return data
+
+
+def read_csv_multiple(filename: str) -> list[dict[str, float]]:
+    filepath = "data/" + filename
+    data_list = []
+    for n in [1, 2, 3, 4]:
+        data = {}
+        with open(filepath, 'r') as file:
+            reader = csv.reader(file)
+            for line in reader:
+                key = line[0]
+                value = line[n]
+                try:
+                    data[key] = float(value)
+                except ValueError:
+                    data[key] = value
+        data_list.append(data)
+    return data_list
+
+
+def plot_velocity_over_time_and_distance_multi(data: list[dict[str, float]], v_key: str, acc_key: str, title: str)\
+        -> None:
+    velocity_over_time_and_distance = []
+    for d in data:
+        v = d[v_key]
+        acc = d[acc_key]
+        label = d["Game"]
+        velocity_over_time_and_distance.append(calc_velocity_over_time_and_distance(v, acc, label))
+    plot_and_safe_3d(velocity_over_time_and_distance, 'time (s)', 'distance (m)', 'velocity (m/s)', title)
+
+
+def plot_movement_over_time_and_distance_multi(data: list[dict[str, float]], v_key: str, acc_key: str, dec_key: str, title: str)\
+        -> None:
+    movement_over_time_and_distance = []
+    for d in data:
+        v = d[v_key]
+        acc = d[acc_key]
+        dec = d[dec_key]
+        label = d["Game"]
+        movement_over_time_and_distance.append(calc_movement_over_time_and_distance(v, acc, dec, label))
+    plot_and_safe_3d(movement_over_time_and_distance, 'time (s)', 'distance (m)', 'velocity (m/s)', title)
+
+
+def plot_height_over_time_and_distance_multi(data: list[dict[str, float]], jump_key: str, gravity_key: str, v_key: str, title: str)\
+        -> None:
+    height_over_time_and_distance = []
+
+    for d in data:
+        jump = d[jump_key]
+        gravity = d[gravity_key]
+        v = d[v_key]
+        label = d["Game"]
+        height_over_time_and_distance.append(calc_height_over_time_and_distance(jump, gravity, v, label))
+    plot_and_safe_3d(height_over_time_and_distance, 'time (s)', 'distance (m)', 'height (m)', title)
+
 
 
 def calc_velocity_over_time(v: float, acc: float, label: Optional[str] = None) -> Data:
@@ -390,6 +470,7 @@ def plot_and_safe_3d(data: list[Data3D], xlabel: str, ylabel: str, zlabel: str, 
     title.lower()
     path = "plots/" + title
     fig.savefig(path + ".png")
+
     plt.show()
 
 
