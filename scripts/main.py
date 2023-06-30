@@ -3,12 +3,12 @@ from Data import *
 
 def main() -> None:
     # example to plot 3d all games in comparison
-    filename = "All.csv"
-    plot_all_comparisons_in_3d(filename, 500, '+')
+    # filename = "All.csv"
+    # plot_all_comparisons_in_3d(filename, 500, '+')
 
     # example to plot 3d one game and those movement in comparison
-    # filename = "Ours.csv"
-    # plot_single_in_3d(filename, 500, '+')
+    filename = "Ours.csv"
+    plot_single_in_3d(filename, 500, '+')
 
 
 def plot_all_comparisons_in_3d(filename: str, scatter_amount: int, symbol: str) -> None:
