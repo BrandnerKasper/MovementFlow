@@ -73,7 +73,7 @@ All default movement options in form of walking, sprinting, climbing and fast cl
 ![Velocity over time and distance with the movement options: walking, sprinting, climbing and fast climbing](plots/Default/3D/Velocity%20over%20time%20and%20distance.png)
 
 With there movement over time and distance:
-![Test](plots/Default/3D/Movement%20over%20time%20and%20distance.png)
+![Movement over time and distance with the movement options: walking, sprinting, climbing and fast climbing](plots/Default/3D/Movement%20over%20time%20and%20distance.png)
 
-And the different jumps:
-![Jumps](plots/Default/3D/Jump%20Height%20over%20Time%20and%20Distance.png)
+And the different jumps types: default, double, triple, long, wall jump (no input) and wall jump (with input):
+![Jump height over time and distance with the jump types: default, double, triple, long, wall jump (no input), wall jump (with input)](plots/Default/3D/Jump%20Height%20over%20Time%20and%20Distance.png)
